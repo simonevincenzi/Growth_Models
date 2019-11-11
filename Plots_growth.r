@@ -19,88 +19,88 @@ library(ggrepel)
 
 
 
-ll_list_temp_gomp = readRDS("ll_list_temp_gomp.RDS")
-ll_list_temp_vb = readRDS("ll_list_temp_vb.RDS")
-ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
-
-# ll_list_temp = c(ll_list_temp_vb_all_data, ll_list_temp_gomp_all_data)
-
-# ll_list_temp[[3]] = NULL
-
-
-pred_df = data.frame()
-rsq_df = data.frame()
-test_df = data.frame()
-train_df = data.frame()
-
-
-for (i in 1:length(ll_list_temp)) {
-  
-  pred_df = bind_rows(pred_df, ll_list_temp[[i]]$pred_df %>% filter(., Age == 1))
-  rsq_df = bind_rows(rsq_df,ll_list_temp[[i]]$model_rsq)
-  test_df = bind_rows(test_df,ll_list_temp[[i]]$test_df)
-  train_df = bind_rows(train_df,ll_list_temp[[i]]$train_df[1,])
-  print(i)
-  
-}
-
-pred_df$Species = NA
-#$for (i in 1:nrow(pred_df)) {
-
-pred_df$Species[which(pred_df$Pop == "LIdri_MT")] = "MT"
-pred_df$Species[which(pred_df$Pop == "UIdri_MT")] = "MT"
-pred_df$Species[which(pred_df$Pop == "LIdri_RT")] = "RT"
-pred_df$Species[which(pred_df$Pop == "UVol_BT")] = "BT"
-
-if (pred_df$Pop[i] == "LIdri_MT") {pred_df$Species[i] = "MT"}
-if (pred_df$Pop[i] == "UIdri_MT") {pred_df$Species[i] = "MT"}
-if (pred_df$Pop[i] == "LIdri_RT") {pred_df$Species[i] = "RT"}
-if (pred_df$Pop[i] == "UVol_BT") {pred_df$Species[i] = "BT"}
-#}
-
-saveRDS(pred_df, "pred_df.RDS")
-saveRDS(rsq_df, "rsq_df.RDS")
-saveRDS(train_df, "train_df.RDS")
-saveRDS(test_df, "test_df.RDS")
-
-
-pred_df = readRDS("pred_df.RDS")
-rsq_df = readRDS("rsq_df.RDS")
-train_df = readRDS("train_df.RDS")
-test_df = readRDS("test_df.RDS")
-
-
-
-avg_rsq_df = rsq_df %>% group_by(model, func) %>% 
-  summarise(n = n(),
-            rsq_gam_train = mean(rsq_gam_train),
-            rsq_gam_test_mean = mean(rsq_gam_test),
-            rsq_gam_test_sd = sd(rsq_gam_test),
-            logRMSE_gam_test = mean(logRMSE_gam_test),
-            logRMSE_gam_train = mean(logRMSE_gam_train),
-            RMSE_gam_test = mean(RMSE_gam_test),
-            RMSE_gam_train = mean(RMSE_gam_train),
-            mean_error_gam_train = mean(mean_error_gam_train),
-            max_error_gam_test = mean(max_error_gam_test),
-            id_gam = mean(id_gam),
-            age_gam = mean(age_gam),
-            std = mean(std),
-            conv = mean(conv)) %>% 
-  filter(., std == 1) %>% 
-  arrange(., desc(rsq_gam_test_mean))
-
-if (nrow(avg_rsq_df) == 24) {
-  
-  avg_rsq_df = avg_rsq_df %>% left_join(., select(rsq_df, model, func, AIC)) 
-
-} 
-
+# ll_list_temp_gomp = readRDS("ll_list_temp_gomp.RDS")
+# ll_list_temp_vb = readRDS("ll_list_temp_vb.RDS")
+# ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
+# 
+# # ll_list_temp = c(ll_list_temp_vb_all_data, ll_list_temp_gomp_all_data)
+# 
+# # ll_list_temp[[3]] = NULL
+# 
+# 
+# pred_df = data.frame()
+# rsq_df = data.frame()
+# test_df = data.frame()
+# train_df = data.frame()
+# 
+# 
+# for (i in 1:length(ll_list_temp)) {
+#   
+#   pred_df = bind_rows(pred_df, ll_list_temp[[i]]$pred_df %>% filter(., Age == 1))
+#   rsq_df = bind_rows(rsq_df,ll_list_temp[[i]]$model_rsq)
+#   test_df = bind_rows(test_df,ll_list_temp[[i]]$test_df)
+#   train_df = bind_rows(train_df,ll_list_temp[[i]]$train_df[1,])
+#   print(i)
+#   
+# }
+# 
+# pred_df$Species = NA
+# #$for (i in 1:nrow(pred_df)) {
+# 
+# pred_df$Species[which(pred_df$Pop == "LIdri_MT")] = "MT"
+# pred_df$Species[which(pred_df$Pop == "UIdri_MT")] = "MT"
+# pred_df$Species[which(pred_df$Pop == "LIdri_RT")] = "RT"
+# pred_df$Species[which(pred_df$Pop == "UVol_BT")] = "BT"
+# 
+# if (pred_df$Pop[i] == "LIdri_MT") {pred_df$Species[i] = "MT"}
+# if (pred_df$Pop[i] == "UIdri_MT") {pred_df$Species[i] = "MT"}
+# if (pred_df$Pop[i] == "LIdri_RT") {pred_df$Species[i] = "RT"}
+# if (pred_df$Pop[i] == "UVol_BT") {pred_df$Species[i] = "BT"}
+# #}
+# 
+# saveRDS(pred_df, "pred_df.RDS")
+# saveRDS(rsq_df, "rsq_df.RDS")
+# saveRDS(train_df, "train_df.RDS")
+# saveRDS(test_df, "test_df.RDS")
+# 
+# 
+# pred_df = readRDS("pred_df.RDS")
+# rsq_df = readRDS("rsq_df.RDS")
+# train_df = readRDS("train_df.RDS")
+# test_df = readRDS("test_df.RDS")
+# 
+# 
+# 
+# avg_rsq_df = rsq_df %>% group_by(model, func) %>% 
+#   summarise(n = n(),
+#             rsq_gam_train = mean(rsq_gam_train),
+#             rsq_gam_test_mean = mean(rsq_gam_test),
+#             rsq_gam_test_sd = sd(rsq_gam_test),
+#             logRMSE_gam_test = mean(logRMSE_gam_test),
+#             logRMSE_gam_train = mean(logRMSE_gam_train),
+#             RMSE_gam_test = mean(RMSE_gam_test),
+#             RMSE_gam_train = mean(RMSE_gam_train),
+#             mean_error_gam_train = mean(mean_error_gam_train),
+#             max_error_gam_test = mean(max_error_gam_test),
+#             id_gam = mean(id_gam),
+#             age_gam = mean(age_gam),
+#             std = mean(std),
+#             conv = mean(conv)) %>% 
+#   filter(., std == 1) %>% 
+#   arrange(., desc(rsq_gam_test_mean))
+# 
+# if (nrow(avg_rsq_df) == 24) {
+#   
+#   avg_rsq_df = avg_rsq_df %>% left_join(., select(rsq_df, model, func, AIC)) 
+# 
+# } 
+# 
 
 
 #### Plot of distribution of Linf, A, k, kG, correlation betwwen them, and density plot. Targ is the model used
 
 
-pred_df = readRDS("~/Dropbox/Articoli/Limit_sampling/pred_df_all_data.RDS")
+pred_df = readRDS("data/pred_df_all_data.RDS")
 
 targ = "mod_3_rand_l_Species_k_Pop_t0_Pop"
 
@@ -347,6 +347,13 @@ save_plot("Plots_growth/Plot_linf.pdf", Plot_linf_all,
           base_aspect_ratio = 0.7,
           base_height = 10)
 
+save_plot("Plots_growth/Plot_k.pdf", Plot_k_all,
+          ncol = 2, # we're saving a grid plot of 2 columns
+          nrow = 1, # and 2 rows
+          # each individual subplot should have an aspect ratio of 1.3
+          base_aspect_ratio = 0.7,
+          base_height = 10)
+
 save_plot("Plots_growth/Plot_corr.pdf", Plot_corr,
           ncol = 2, # we're saving a grid plot of 2 columns
           nrow = 1, # and 2 rows
@@ -355,60 +362,14 @@ save_plot("Plots_growth/Plot_corr.pdf", Plot_corr,
           base_height = 10)
 
 
-save_plot("Plots_growth/Plot_corr_RT.pdf", Plot_corr,
-          ncol = 2, # we're saving a grid plot of 2 columns
-          nrow = 1, # and 2 rows
-          # each individual subplot should have an aspect ratio of 1.3
-          base_aspect_ratio = 0.7,
-          base_height = 10)
-
-
-
-
-
-# # pop_targ = "UVol_BT"
-# # test = filter(plot_list[[1]]$sum_linf_df,
-# #               Pop == pop_targ)$linf - filter(plot_list[[2]]$sum_linf_df,
-# #                                              Pop == pop_targ)$linf 
-# # hist(test)
-# # 
-# # 
-# # ks.test(x = filter(plot_list[[1]]$sum_linf_df,
-# #                    Pop == pop_targ)$linf, y = filter(plot_list[[2]]$sum_linf_df,
-# #                                                   Pop == pop_targ)$linf)
-# 
-# 
-# save_plot("Plots/Plot_linf_all_final_2.pdf", Plot_linf_all,
+# save_plot("Plots_growth/Plot_corr_RT.pdf", Plot_corr,
 #           ncol = 2, # we're saving a grid plot of 2 columns
-#           nrow = 2, # and 2 rows
+#           nrow = 1, # and 2 rows
 #           # each individual subplot should have an aspect ratio of 1.3
-#           base_aspect_ratio = 1.7)
-# 
-# 
-# 
-# #####
-# 
-# 
-# max <- 30 #20
-# x <- 1:length(ll_list_temp)
-# d1 <- split(1:length(ll_list_temp), ceiling(x/max))
-# 
-# all_pred = data.frame()
-# 
-# for (i in 1:length(d1)) {
-#   
-#   prov_df = data.frame()
-#   
-#   for (j in d1[[i]]) {
-#     
-#     prov_df = bind_rows(prov_df, ll_list_temp[[j]]$pred_df[1,])
-#     
-#     print(j)
-#     
-#   }
-#   
-#   all_pred = bind_rows(all_pred, prov_df)
-#   
-# }
-# 
-# ####
+#           base_aspect_ratio = 0.7,
+#           base_height = 10)
+
+
+
+
+

@@ -1,18 +1,23 @@
 ## add install.packages routine
 
+if(!require(pacman))install.packages("pacman")
+pacman::p_load("tidyverse", "data.table", "parallel", "MASS", "brms", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+library("TMBhelper")
 
-library(tidyverse)
-library(data.table)
-library(parallel)
-library(brms)
-library(TMB)
-library(lubridate)
-library(devtools)
-#devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
-library(TMBhelper)
-library(Metrics)
-library(rlist)
-library(withr)
+
+# library(tidyverse)
+# library(data.table)
+# library(parallel)
+# library(brms)
+# library(TMB)
+# library(lubridate)
+# library(devtools)
+# devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+# library(TMBhelper)
+# library(Metrics)
+# library(rlist)
+# library(withr)
 
 
 #### Read and manipulate data
@@ -65,24 +70,13 @@ uppidri_df = dplyr::select(uppidri_df, Species, Mark_ind, Date, Year, Month, Run
          Age = Age_cor,
          Mark = Mark_ind)
 
-
-###
-
-# unique(filter(uppidri_df, Age < 0)$Mark)
-
  uppidri_df = filter(uppidri_df, !Mark %in% unique(filter(uppidri_df, Age < 0)$Mark))
-
-# test = uppidri_df %>% group_by(Mark) %>% 
-  mutate(diff_length = Length - lag(Length)) 
-
-#View(filter(test, diff_length < 0))
 
 ###
 
 
 #### Lower Idrijca - Rainbow trout
 
-#rtidri_df = read_csv("rtidri_df_pieced.csv")
 
 rtidri_df = fread("https://raw.githubusercontent.com/simonevincenzi/Heter/master/raw_data/rtidri_df_pieced.csv")
 
@@ -109,8 +103,6 @@ rtidri_df = dplyr::select(rtidri_df, Species, Mark_ind, Date, Year, Month, Run, 
 
 #### Upper Volaja - Brown
 
-
-# uppvol_df = read.csv("uppvol_2015_complete.csv",header=T, stringsAsFactors = FALSE,na.strings ="") 
 
 uppvol_df = fread("https://raw.githubusercontent.com/simonevincenzi/Heter/master/raw_data/uppvol_2015_complete.csv")
 
@@ -153,13 +145,16 @@ mark_all_pop_df = bind_rows(loidri_mark_map,
                             rtidri_mark_map,
                             uppvol_mark_map)
 
+
+saveRDS(mark_all_pop_df, "data/mark_all_pop_df.RDS")
+
 all_pop_df = bind_rows(loidri_df,
                        uppidri_df,
                        rtidri_df,
                        uppvol_df) %>% filter(., !is.na(Cohort), Age > 0 ,
                                              !is.na(Length), Length > 0, Month == 9)
 
-saveRDS(all_pop_df, "all_pop_df.RDS")
+saveRDS(all_pop_df, "data/all_pop_df.RDS")
 
 long_all_pop_df = all_pop_df %>% group_by(Mark,Pop) %>% summarize(n = n(), min_age = min(Age)) %>% 
   rename(Mark_ind = Mark) %>%  left_join(., mark_all_pop_df)
@@ -353,8 +348,6 @@ avg_rsq_df = rsq_df %>% group_by(model, func) %>%
   filter(., std == 1) %>% 
   arrange(., desc(rsq_gam_test_mean))
 
-# saveRDS(avg_rsq_df,"avg_rsq_df.RDS") 
-
 
 # if no validation, I also add a column with the AIC of model on the full data set
 
@@ -365,68 +358,3 @@ if (validation == 0) {
 }
                                                       
 
-
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# unique(pred_df$mod_id[which(pred_df$model=="mod_3_rand_l_Species_k_Pop_t0_Pop")])
-# 
-# targ = "mod_3_rand_l_Pop_k_Pop_t0_Pop"
-# 
-# func_targ = "vb"
-# 
-# min_cont = min(unique(pred_df$cont[which(pred_df$model==targ & 
-#                               pred_df$func == func_targ)]))
-# 
-# targ_mod = filter(pred_df, model == targ, func == func_targ,
-#                   cont == min_cont)
-# #rsq_df = filter(rsq_df, std == 1)
-# 
-# #test = filter(pred_df, model == "mod_3_rand_l_Const_k_Const_t0_Pop", func == "gomp")
-# 
-# #
-# #
-# # # ll_list_temp %>% group_by(model) %>% summarise(n = n(), length_na = sum(is.na(pred_std)))
-# #
-# #  test = mclapply(2,function (x) do.call(gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f,data_region_list_full[[x]]),
-# #                  mc.cores = 5, mc.preschedule = F)
-# #
-# #
-#  
-# sum_linf_df = targ_mod %>% group_by(Mark) %>%
-#    summarise(n = n(), linf = mean(linf),
-#              k = mean(k), Pop = unique(Pop), Species = unique(Species))
-# 
-# 
-#  ggplot(data = sum_linf_df, aes(x = linf, col = Species, 
-#                                  shape = Pop)) +
-#    geom_density(alpha = 0.1) + theme_minimal()
-#  
-#  ggplot(data = sum_linf_df, aes(x = k, col = Pop, fill = Pop, shape = Pop)) +
-#    geom_density(alpha = 0.1) + theme_minimal()
-# 
-# # 
-#  ggplot(data = sum_linf_df, aes(x = linf, y = k, col = Pop, fill = Pop)) +
-#    geom_point() + theme_minimal()
-# #
-# #  data_region_df = data_region_list_full[[2]]$data_region_df
-# #  mark_all_pop_df = data_region_list_full[[2]]$mark_all_pop_df
-# #  age_cut = data_region_list_full[[2]]$age_cut
-# #  cont = data_region_list_full[[2]]$cont
-# #  data_compl = data_region_list_full[[2]]$data_compl
-# #  rand_eff_n = data_region_list_full[[2]]$rand_eff_n
-# #  linf_var = data_region_list_full[[2]]$linf_var
-# #  k_var = data_region_list_full[[2]]$k_var
-# #  t0_var = data_region_list_full[[2]]$t0_var
-# #  mod_id = data_region_list_full[[2]]$mod_id
-# #  valid = 1

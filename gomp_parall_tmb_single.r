@@ -1,18 +1,26 @@
 ## add install.packages routine
 
 
-library(tidyverse)
-library(data.table)
-library(parallel)
-library(brms)
-library(TMB)
-library(lubridate)
-library(devtools)
-#devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
-library(TMBhelper)
-library(Metrics)
-library(rlist)
-library(withr)
+if(!require(pacman))install.packages("pacman")
+pacman::p_load("tidyverse", "data.table", "parallel", "MASS", "brms", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+library("TMBhelper")
+
+
+
+
+# library(tidyverse)
+# library(data.table)
+# library(parallel)
+# library(brms)
+# library(TMB)
+# library(lubridate)
+# library(devtools)
+# #devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+# library(TMBhelper)
+# library(Metrics)
+# library(rlist)
+# library(withr)
 
 
 #### Read and manipulate data
@@ -66,16 +74,7 @@ uppidri_df = dplyr::select(uppidri_df, Species, Mark_ind, Date, Year, Month, Run
          Mark = Mark_ind)
 
 
-###
-
-# unique(filter(uppidri_df, Age < 0)$Mark)
-
 uppidri_df = filter(uppidri_df, !Mark %in% unique(filter(uppidri_df, Age < 0)$Mark))
-
-# test = uppidri_df %>% group_by(Mark) %>% 
-mutate(diff_length = Length - lag(Length)) 
-
-#View(filter(test, diff_length < 0))
 
 ###
 
@@ -163,7 +162,6 @@ long_all_pop_df = all_pop_df %>% group_by(Mark,Pop) %>% summarize(n = n(), min_a
   rename(Mark_ind = Mark) %>%  left_join(., mark_all_pop_df)
 
 
-#all_pop_df = filter(all_pop_df,Pop %in% c("UIdri_MT"))
 
 # Find the fish with the longest time series (min 3 observations) and use them for prediction
 # Predict 
@@ -283,124 +281,94 @@ for (i in 1:length(d1)) {
   cat(cat(as.character(Sys.time()), file=logFile, append=TRUE, sep = "\n"), file=logFile, append=TRUE, sep = "\n")
 }
 
-# ll_list_temp = rbindlist(ll_list_temp)
 
 }
-
-
-# ll_list_temp_gomp_single = readRDS("ll_list_temp_gomp_single_UIdri_MT.RDS")
-# ll_list_temp_vb_single = readRDS("ll_list_temp_vb_single_UIdri_MT.RDS")
 
 
 ll_list_temp_single = c(ll_list_temp_gomp_single, ll_list_temp_vb_single)
 
-# ll_list_temp[[3]] = NULL
+single_rds = c("ll_list_temp_vb_single_UVol_BT","ll_list_temp_gomp_single_UVol_BT",
+              "ll_list_temp_vb_single_UIdri_MT","ll_list_temp_gomp_single_UIdri_MT",
+              "ll_list_temp_vb_single_LIdri_RT","ll_list_temp_gomp_single_LIdri_RT",
+              "ll_list_temp_vb_single_LIdri_MT", "ll_list_temp_gomp_single_LIdri_MT")
 
 
-pred_df = data.frame()
-rsq_df = data.frame()
-test_df = data.frame()
-train_df = data.frame()
+pred_single_df = data.frame()
+rsq_single_df = data.frame()
+test_single_df = data.frame()
+train_single_df = data.frame()
 
 
-for (i in 1:length(ll_list_temp_single)) {
+for (j in 1:length(single_rds)) {
   
-  if (class(ll_list_temp_single[[i]]) != "try-error") { # need to check for errors
-  pred_df = bind_rows(pred_df, ll_list_temp_single[[i]]$pred_df %>% filter(., Age == 1))
-  rsq_df = bind_rows(rsq_df,ll_list_temp_single[[i]]$model_rsq)
-  test_df = bind_rows(test_df,ll_list_temp_single[[i]]$test_df)
-  train_df = bind_rows(train_df,ll_list_temp_single[[i]]$train_df[1,])
-  print(i)
+  print(j)
+  
+  ll_list_temp = readRDS(paste(single_rds[j],".RDS",sep = ""))
+  
+  pred_df = data.frame()
+  rsq_df = data.frame()
+  test_df = data.frame()
+  train_df = data.frame()
+  
+  
+  for (i in 1:length(ll_list_temp)) {
+    
+    if (length(ll_list_temp[[i]])>1) {
+      
+      pred_df = bind_rows(pred_df, ll_list_temp[[i]]$pred_df %>% filter(., Age == 1))
+      rsq_df = bind_rows(rsq_df,ll_list_temp[[i]]$model_rsq)
+      #test_df = bind_rows(test_df,ll_list_temp[[i]]$test_df)
+      #train_df = bind_rows(train_df,ll_list_temp[[i]]$train_df[1,])
+      print(i)
+      
+    }
+    
+    pred_df$Species = NA
+    #$for (i in 1:nrow(pred_df)) {
+    
+    pred_df$Species[which(pred_df$Pop == "LIdri_MT")] = "MT"
+    pred_df$Species[which(pred_df$Pop == "UIdri_MT")] = "MT"
+    pred_df$Species[which(pred_df$Pop == "LIdri_RT")] = "RT"
+    pred_df$Species[which(pred_df$Pop == "UVol_BT")] = "BT"
+    
+    if (pred_df$Pop[i] == "LIdri_MT") {pred_df$Species[i] = "MT"}
+    if (pred_df$Pop[i] == "UIdri_MT") {pred_df$Species[i] = "MT"}
+    if (pred_df$Pop[i] == "LIdri_RT") {pred_df$Species[i] = "RT"}
+    if (pred_df$Pop[i] == "UVol_BT") {pred_df$Species[i] = "BT"}
+    #}
+    
+    avg_rsq_single_df = rsq_df %>% group_by(model, func) %>% 
+      summarise(n = n(),
+                rsq_gam_train = mean(rsq_gam_train),
+                rsq_gam_test_mean = mean(rsq_gam_test),
+                rsq_gam_test_sd = sd(rsq_gam_test),
+                logRMSE_gam_test = mean(logRMSE_gam_test),
+                logRMSE_gam_train = mean(logRMSE_gam_train),
+                RMSE_gam_test = mean(RMSE_gam_test),
+                RMSE_gam_train = mean(RMSE_gam_train),
+                mean_error_gam_train = mean(mean_error_gam_train),
+                max_error_gam_test = mean(max_error_gam_test),
+                id_gam = mean(id_gam),
+                age_gam = mean(age_gam),
+                std = mean(std),
+                conv = mean(conv)) %>% 
+      filter(., std == 1) %>% 
+      arrange(., desc(rsq_gam_test_mean))
+    
+    avg_rsq_single_df$Pop = pred_df$Pop[1]
+    avg_rsq_single_df$Species = pred_df$Species[1]
+    
+    #test_df$Pop = pred_df$Pop[1]
+    #test_df$Species = pred_df$Species[1]
+    
+    #train_df$Pop = pred_df$Pop[1]
+    #train_df$Species = pred_df$Species[1]
+    
+    pred_single_df = bind_rows(pred_single_df, pred_df)
+    rsq_single_df = bind_rows(rsq_single_df, rsq_df)
+    #test_single_df = bind_rows(test_single_df, test_df)
+    #train_single_df = bind_rows(train_single_df, train_df)
+    
   }
+  
 }
-
-pred_df$Species = NA
-
-pred_df$Species[which(pred_df$Pop == "LIdri_MT")] = "MT"
-pred_df$Species[which(pred_df$Pop == "UIdri_MT")] = "MT"
-pred_df$Species[which(pred_df$Pop == "LIdri_RT")] = "RT"
-pred_df$Species[which(pred_df$Pop == "UVol_BT")] = "BT"
-
-if (pred_df$Pop[i] == "LIdri_MT") {pred_df$Species[i] = "MT"}
-if (pred_df$Pop[i] == "UIdri_MT") {pred_df$Species[i] = "MT"}
-if (pred_df$Pop[i] == "LIdri_RT") {pred_df$Species[i] = "RT"}
-if (pred_df$Pop[i] == "UVol_BT") {pred_df$Species[i] = "BT"}
-
-
-avg_rsq_df = rsq_df %>% group_by(model, func) %>% 
-  summarise(n = n(),
-            rsq_gam_train = mean(rsq_gam_train),
-            rsq_gam_test_mean = mean(rsq_gam_test),
-            rsq_gam_test_sd = sd(rsq_gam_test),
-            logRMSE_gam_test = mean(logRMSE_gam_test),
-            logRMSE_gam_train = mean(logRMSE_gam_train),
-            RMSE_gam_test = mean(RMSE_gam_test),
-            RMSE_gam_train = mean(RMSE_gam_train),
-            mean_error_gam_train = mean(mean_error_gam_train),
-            max_error_gam_test = mean(max_error_gam_test),
-            id_gam = mean(id_gam),
-            age_gam = mean(age_gam),
-            std = mean(std),
-            conv = mean(conv)) %>% 
-  filter(., std == 1) %>% 
-  arrange(., desc(rsq_gam_test_mean))
-
-
-
-
-# unique(pred_df$mod_id[which(pred_df$model=="mod_3_rand_l_Const_k_Const_t0_Const")])
-# 
-# targ = "mod_3_rand_l_Const_k_Const_t0_Const"
-# 
-# func_targ = "gomp"
-# 
-# min_cont = min(unique(pred_df$cont[which(pred_df$model==targ & 
-#                                            pred_df$func == func_targ)]))
-# 
-# targ_mod = filter(pred_df, model == targ, func == func_targ,
-#                   cont == min_cont)
-# #rsq_df = filter(rsq_df, std == 1)
-# 
-# #test = filter(pred_df, model == "mod_3_rand_l_Const_k_Const_t0_Pop", func == "gomp")
-# 
-# #
-# #
-# # # ll_list_temp_single %>% group_by(model) %>% summarise(n = n(), length_na = sum(is.na(pred_std)))
-# #
-# #  test = mclapply(2,function (x) do.call(gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f,data_region_list_full[[x]]),
-# #                  mc.cores = 5, mc.preschedule = F)
-# #
-# #
-# 
-# sum_linf_df = targ_mod %>% group_by(Mark) %>%
-#   summarise(n = n(), linf = mean(linf),
-#             k = mean(k), Pop = unique(Pop), Species = unique(Species))
-# 
-# 
-# ggplot(data = sum_linf_df, aes(x = linf, 
-#                                shape = Pop)) +
-#   geom_density(alpha = 0.1) + theme_minimal()
-# 
-# ggplot(data = sum_linf_df, aes(x = k, col = Pop, fill = Pop, shape = Pop)) +
-#   geom_density(alpha = 0.1) + theme_minimal()
-# 
-# # 
-# ggplot(data = sum_linf_df, aes(x = linf, y = k, col = Pop, fill = Pop)) +
-#   geom_point() + theme_minimal()
-# 
-# 
-# ggplot(data = sum_linf_df, aes(x = linf, y = k)) +
-#   geom_density_2d(col = "black") + theme_minimal()
-# 
-# #
-# #  data_region_df = data_region_list_full[[2]]$data_region_df
-# #  mark_all_pop_df = data_region_list_full[[2]]$mark_all_pop_df
-# #  age_cut = data_region_list_full[[2]]$age_cut
-# #  cont = data_region_list_full[[2]]$cont
-# #  data_compl = data_region_list_full[[2]]$data_compl
-# #  rand_eff_n = data_region_list_full[[2]]$rand_eff_n
-# #  linf_var = data_region_list_full[[2]]$linf_var
-# #  k_var = data_region_list_full[[2]]$k_var
-# #  t0_var = data_region_list_full[[2]]$t0_var
-# #  mod_id = data_region_list_full[[2]]$mod_id
-# #  valid = 1

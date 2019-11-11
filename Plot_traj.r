@@ -165,6 +165,8 @@ Plot_tr_gr_all = plot_grid(loidri_tr_gg,
                         labels = c("(a)", "(b)","(c)","(d)"),
                         nrow = 2, align = "v",hjust = -4.8)
 
+dir.create("Plots_growth", showWarnings = FALSE)
+
 save_plot("Plots_growth/Plot_tr_gr_all_.pdf", Plot_tr_gr_all,
           ncol = 2, # we're saving a grid plot of 2 columns
           nrow = 2, # and 2 rows

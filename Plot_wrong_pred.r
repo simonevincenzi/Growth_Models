@@ -57,6 +57,8 @@ theme.out =  theme(plot.title = element_text(lineheight=.8, face="bold", size = 
                    legend.key = element_rect(fill = "white")) 
 
 
+source("load_data.r")
+
 #### Limit digits in avg_rsq_d numeric variables
 
 is.num <- sapply(avg_rsq_df, is.numeric)
@@ -64,8 +66,8 @@ avg_rsq_df[is.num] <- lapply(avg_rsq_df[is.num], round, 2)
 
 #### Routine for statistics for each model/populaiton on model parameters
 
-source("load_data.r")
-pred_df = readRDS("~/Dropbox/Articoli/Limit_sampling/pred_df_all_data.RDS")
+
+pred_df = readRDS("data/pred_df_all_data.RDS")
 
 model_df = unique(avg_rsq_df$model)
 
@@ -118,7 +120,7 @@ for (i in 1:length(model_df)) {
      
 
 
-#### Model for correlation test of model estimates and plot of correlation
+#### Model for correlation test of model estimates of asymptotic size within populations and plot of correlation
 
 
 test_param_corr = select(filter(param_corr_df, func == "vb"), model, Pop, func, Linf_mean) %>%
@@ -135,7 +137,7 @@ test_param_corr %>%  group_by(Pop) %>%
             ratio_min = min(Linf_vb/Linf_gomp),
             ratio_max = max(Linf_vb/Linf_gomp))
 
-
+### Plot of asymptotic size estimated with Gompertz and von Bertalanffy model
 
 Plot_corr_linf = ggplot(data = test_param_corr, aes(x = Linf_gomp, y = Linf_vb, shape = Pop, col = Pop)) +
   geom_point(size = 3) + 
@@ -182,6 +184,9 @@ time_data = filter(all_pop_df, Mark %in% worst_pred$Mark_ind) %>%  group_by(Mark
 
 worst_pred = worst_pred %>% left_join(.,select(time_data, Mark,Length), by = c("Mark_ind" = "Mark")) %>% rename(Mark = Mark_ind)
 
+saveRDS(worst_pred,"data/worst_pred.RDS")
+
+
 #### Plot of worst predicted individuals with in the background the trajectories of the individuals in their populations
 
 max_age = 7.5 
@@ -206,15 +211,15 @@ ggsave("Plots_growth/Plot_wrong_pred.jpg", Plot_wrong_pred, width = 9.5, height 
 #### Plot for prediction of test data (one good, one bad)
 
 
-ll_list_temp_gomp = readRDS("ll_list_temp_gomp.RDS")
-ll_list_temp_vb = readRDS("ll_list_temp_vb.RDS")
+ll_list_temp_gomp = readRDS("data/ll_list_temp_gomp.RDS")
+ll_list_temp_vb = readRDS("data/ll_list_temp_vb.RDS")
 ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
 
 
 pred_traj_df = data.frame()
 test_traj_df = data.frame()
 
-pred_df = readRDS("~/Dropbox/Articoli/Limit_sampling/pred_df.RDS")
+pred_df = readRDS("data/pred_df.RDS")
 pred_model = "mod_3_rand_l_Species_k_Pop_t0_Pop"  # which model to use
 
 for (i in 1:length(ll_list_temp)) {
@@ -306,8 +311,8 @@ save_plot("Plots_growth/Plot_pred_all.pdf", Plot_pred_all,
 
 #####
 
-ll_list_temp_gomp = readRDS("ll_list_temp_gomp_all_data.RDS")
-ll_list_temp_vb = readRDS("ll_list_temp_vb_all_data.RDS")
+ll_list_temp_gomp = readRDS("data/ll_list_temp_gomp_all_data.RDS")
+ll_list_temp_vb = readRDS("data/ll_list_temp_vb_all_data.RDS")
 ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
 
 
@@ -331,9 +336,12 @@ for (i in 1:length(ll_list_temp)) {
 test_traj_df$diff = test_traj_df$Length - test_traj_df$pred_mean   
 
 cont_min = min(unique(test_traj_df$cont))
-test = select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "vb", cont == cont_min) %>% 
-  left_join(., select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "gomp", cont == cont_min), by = c("Mark","Age","Pop")) %>% 
+test = select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "vb", cont == cont_min) %>%
+  left_join(., select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "gomp", cont == cont_min), by = c("Mark","Age","Pop")) %>%
   mutate(., diff_diff = diff.x - diff.y)
+
+with(test, cor.test(diff.x,diff.y))
+with(test, plot(diff.x ~ diff.y))
 
 cont_min = min(unique(pred_traj_df$cont))
 test_linf = pred_traj_df %>% 
@@ -341,15 +349,17 @@ test_linf = pred_traj_df %>%
   group_by(Mark, func, Pop) %>% 
   summarise(linf = linf, k=k, t0 = t0)
 
+saveRDS(test_linf, "data/test_linf.RDS")
+
 
 filter(test_linf, Mark %in% (test %>% filter(., Pop == "LIdri_RT"))$Mark)
 
-test = test %>% left_join(.,pred_traj_df %>% 
-                            filter(., Age == 1, cont == cont_min) %>%
-                            group_by(Mark, func, Pop) %>% 
-                            summarise(linf = linf, k=k, t0 = t0), by = c("Mark","Pop","func")
-)
-
-with(test, cor.test(diff.x,diff.y))
-with(test, plot(diff.x ~ diff.y))
+# test = test %>% left_join(.,pred_traj_df %>% 
+#                             filter(., Age == 1, cont == cont_min) %>%
+#                             group_by(Mark, func, Pop) %>% 
+#                             summarise(linf = linf, k=k, t0 = t0), by = c("Mark","Pop","func")
+# )
+# 
+# with(test, cor.test(diff.x,diff.y))
+# with(test, plot(diff.x ~ diff.y))
 
