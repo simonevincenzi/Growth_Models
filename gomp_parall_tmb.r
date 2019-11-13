@@ -1,23 +1,23 @@
 ## add install.packages routine
 
 if(!require(pacman))install.packages("pacman")
-pacman::p_load("tidyverse", "data.table", "parallel", "MASS", "brms", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
+pacman::p_load("tidyverse", "data.table", "parallel", "brms", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 library("TMBhelper")
 
 
-# library(tidyverse)
-# library(data.table)
-# library(parallel)
-# library(brms)
-# library(TMB)
-# library(lubridate)
-# library(devtools)
-# devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
-# library(TMBhelper)
-# library(Metrics)
-# library(rlist)
-# library(withr)
+library(tidyverse)
+library(data.table)
+library(parallel)
+library(brms)
+library(TMB)
+library(lubridate)
+library(devtools)
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+library(TMBhelper)
+library(Metrics)
+library(rlist)
+library(withr)
 
 
 #### Read and manipulate data
@@ -312,6 +312,37 @@ for (i in 1:length(ll_list_temp)) {
 
 }
  
+
+### extract single model prediction with prediction and parameter confidence intervals
+pred_df = readRDS("data/pred_df.RDS")
+pred_model = "mod_3_rand_l_Species_k_Pop_t0_Pop"
+pred_traj_df = data.frame()
+test_traj_df = data.frame()
+
+for (i in 1:length(ll_list_temp)) {
+  
+  if(!is.na(ll_list_temp[[i]]$pred_df$model[1])) {
+    if (ll_list_temp[[i]]$pred_df$model[1] ==  pred_model) {
+      pred_traj_df = bind_rows(pred_traj_df, ll_list_temp[[i]]$pred_df %>% filter(., Age <=15))
+      if (ll_list_temp[[i]]$pred_df$func[1] == "vb") {
+        ll_list_temp[[i]]$test_df$func = "vb"
+        test_traj_df = bind_rows(test_traj_df, ll_list_temp[[i]]$test_df)
+      }
+      if (ll_list_temp[[i]]$pred_df$func[1] == "gomp") {
+        ll_list_temp[[i]]$test_df$func = "gomp"
+        test_traj_df = bind_rows(test_traj_df, ll_list_temp[[i]]$test_df)
+      }
+    }
+  }
+  print(i)
+  
+}
+
+pred_traj_df = filter(pred_traj_df, cont == min(cont))
+
+
+####
+
 
 #### Add population and species columns
 
