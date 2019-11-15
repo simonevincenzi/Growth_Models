@@ -22,9 +22,9 @@ The script `Plot_traj.r` produces the plot (`Plots_growth/ Plot_tr_gr_all.pdf`) 
 
 The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtained with the same model, for either Gompertz or von Bertalanffy growth functions (output saved in `Plots_growth/Plot_corr_linf.jpg`); (2) finds the most consistently worst predicted individuals (ouput saved in `data/worst_pred.RDS`) and plots their trajectories with the trajectories of other individuals in the same population in the background (outoput saved in `Plots_growth/Plot_wrong_pred.jpg`); (3) Plot of observed and predicted trajectories for two individuals (output saved in `Plots_growth/Plot_pred_all.pdf`); (4) correlation between estimates of asymptotic size with the two growth functions with the model `mod_3_rand_l_Pop_k_Pop_t0_Pop` (output saved in `data/test_linf.RDS`). 
 
-The scripts `Plots_growth.r`, after choosing a model in the script (e.g., `mod_3_rand_l_Species_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (output saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, ``Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`).
+The scripts `Plots_growth.r`, after choosing a model in the script (e.g., `mod_3_rand_l_Species_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (output saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`).
 
 
 ## 3. Manuscript
 
-The manuscript is currently under review 
+The manuscript is currently under review. A pre-print can be found at 

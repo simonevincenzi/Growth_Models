@@ -140,13 +140,15 @@ test_param_corr %>%  group_by(Pop) %>%
 ### Plot of asymptotic size estimated with Gompertz and von Bertalanffy model
 
 Plot_corr_linf = ggplot(data = test_param_corr, aes(x = Linf_gomp, y = Linf_vb, shape = Pop, col = Pop)) +
-  geom_point(size = 3) + 
+  geom_point(size = 3, stroke = 1.5) + 
   scale_color_manual(values = c("gray30","gray50", "gray60","gray70")) +
   scale_shape_manual(values = c(1,2,3,4)) + 
   theme.out +
   labs(y = bquote(L[infinity](mm))) +
   labs(x = "A (mm)") +
-  scale_x_continuous(limits = c(150,750), breaks = c(200,300, 400, 500, 600, 700)) +
+  geom_abline(slope = 1, intercept = 0,
+              na.rm = FALSE, show.legend = NA, lty = 2) +
+  scale_x_continuous(limits = c(165,750), breaks = c(200,300, 400, 500, 600, 700)) +
   scale_y_continuous(limits = c(150,450),breaks = c(200,300,400)) +
   theme(
     axis.line = element_line(colour = "black"),
