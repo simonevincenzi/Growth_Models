@@ -27,4 +27,4 @@ The scripts `Plots_growth.r`, after choosing a model in the script (e.g., `mod_3
 
 ## 3. Manuscript
 
-The manuscript is currently under review. A pre-print can be found at 
+The manuscript is currently under review. A pre-print can be found at https://www.biorxiv.org/content/10.1101/845222v1
