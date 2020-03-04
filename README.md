@@ -5,6 +5,8 @@ March 2020
 
 ## 1. Model fitting
 
+I ran the scripts and models with R version 3.6.1 (2019-07-05).
+
 The script `gomp_parall_tmb.r` reads tag-recapture data and fits the mixed-effects models in parallel pooling together all populations data. 
 
 The algorithms to fit the models are called from the script `gomp_parall_tmb.r` and are in `scripts/gomp_vB_TMB_parall_validation_choice_rand_choice_cov.r` and in `scripts/vB_TMB_parall_validation_choice_rand_choice_cov.r` for the Gompertz and von Bertalanffy models, respectively.
