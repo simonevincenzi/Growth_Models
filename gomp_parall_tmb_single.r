@@ -2,25 +2,24 @@
 
 
 if(!require(pacman))install.packages("pacman")
-pacman::p_load("tidyverse", "data.table", "parallel", "MASS", "brms", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
+pacman::p_load("tidyverse", "data.table", "parallel", "MASS", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 library("TMBhelper")
 
 
 
 
-# library(tidyverse)
-# library(data.table)
-# library(parallel)
-# library(brms)
-# library(TMB)
-# library(lubridate)
-# library(devtools)
-# #devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
-# library(TMBhelper)
-# library(Metrics)
-# library(rlist)
-# library(withr)
+library(tidyverse)
+library(data.table)
+library(parallel)
+library(TMB)
+library(lubridate)
+library(devtools)
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+library(TMBhelper)
+library(Metrics)
+library(rlist)
+library(withr)
 
 
 #### Read and manipulate data

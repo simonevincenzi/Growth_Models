@@ -1,7 +1,14 @@
+## add install.packages routine
+
+if(!require(pacman))install.packages("pacman")
+pacman::p_load("tidyverse", "data.table", "parallel", "TMB", "lubridate", "devtools", "Metrics", "rlist","withr")
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+library("TMBhelper")
+
+
 library(tidyverse)
 library(data.table)
 library(parallel)
-library(brms)
 library(TMB)
 library(lubridate)
 library(devtools)
@@ -10,7 +17,8 @@ library(TMBhelper)
 library(Metrics)
 library(rlist)
 library(withr)
-library(cowplot)
+
+####
 
 
 data_region_list <- readRDS("~/Dropbox/Articoli/Limit_sampling/data_region_list.RDS")
