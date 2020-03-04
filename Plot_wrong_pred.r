@@ -326,45 +326,45 @@ save_plot("Plots_growth/Plot_pred_all.pdf", Plot_pred_all,
 
 #####
 
-ll_list_temp_gomp = readRDS("data/ll_list_temp_gomp_all_data.RDS")
-ll_list_temp_vb = readRDS("data/ll_list_temp_vb_all_data.RDS")
-ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
-
-
-pred_traj_all_df = data.frame()
-
-for (i in 1:length(ll_list_temp)) {
-  
-  if(!is.na(ll_list_temp[[i]]$pred_df$model[1])) {
-    if (ll_list_temp[[i]]$pred_df$model[1] ==  "mod_3_rand_l_Pop_k_Pop_t0_Pop") {
-      pred_traj_all_df = bind_rows(pred_traj_all_df, ll_list_temp[[i]]$pred_df %>% filter(., Age <=15))
-    }
-  }
-  print(i)
-  
-}
-
-
-
-test_traj_df$diff = test_traj_df$Length - test_traj_df$pred_mean   
-
-cont_min = min(unique(test_traj_df$cont))
-test = select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "vb", cont == cont_min) %>%
-  left_join(., select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "gomp", cont == cont_min), by = c("Mark","Age","Pop")) %>%
-  mutate(., diff_diff = diff.x - diff.y)
-
-with(test, cor.test(diff.x,diff.y))
-with(test, plot(diff.x ~ diff.y))
-
-cont_min = min(unique(pred_traj_df$cont))
-test_linf = pred_traj_df %>% 
-  filter(., Age == 1, cont == cont_min) %>%
-  group_by(Mark, func, Pop) %>% 
-  summarise(linf = linf, k=k, t0 = t0)
-
-saveRDS(test_linf, "data/test_linf.RDS")
-
-
-filter(test_linf, Mark %in% (test %>% filter(., Pop == "LIdri_RT"))$Mark)
+# ll_list_temp_gomp = readRDS("data/ll_list_temp_gomp_all_data.RDS")
+# ll_list_temp_vb = readRDS("data/ll_list_temp_vb_all_data.RDS")
+# ll_list_temp = c(ll_list_temp_gomp, ll_list_temp_vb)
+# 
+# 
+# pred_traj_all_df = data.frame()
+# 
+# for (i in 1:length(ll_list_temp)) {
+#   
+#   if(!is.na(ll_list_temp[[i]]$pred_df$model[1])) {
+#     if (ll_list_temp[[i]]$pred_df$model[1] ==  "mod_3_rand_l_Pop_k_Pop_t0_Pop") {
+#       pred_traj_all_df = bind_rows(pred_traj_all_df, ll_list_temp[[i]]$pred_df %>% filter(., Age <=15))
+#     }
+#   }
+#   print(i)
+#   
+# }
+# 
+# 
+# 
+# test_traj_df$diff = test_traj_df$Length - test_traj_df$pred_mean   
+# 
+# cont_min = min(unique(test_traj_df$cont))
+# test = select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "vb", cont == cont_min) %>%
+#   left_join(., select(test_traj_df, Mark, Pop, model, func, Age, diff,cont) %>% filter(., func == "gomp", cont == cont_min), by = c("Mark","Age","Pop")) %>%
+#   mutate(., diff_diff = diff.x - diff.y)
+# 
+# with(test, cor.test(diff.x,diff.y))
+# with(test, plot(diff.x ~ diff.y))
+# 
+# cont_min = min(unique(pred_traj_df$cont))
+# test_linf = pred_traj_df %>% 
+#   filter(., Age == 1, cont == cont_min) %>%
+#   group_by(Mark, func, Pop) %>% 
+#   summarise(linf = linf, k=k, t0 = t0)
+# 
+# saveRDS(test_linf, "data/test_linf.RDS")
+# 
+# 
+# filter(test_linf, Mark %in% (test %>% filter(., Pop == "LIdri_RT"))$Mark)
 
 
