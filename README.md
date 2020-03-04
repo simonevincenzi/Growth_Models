@@ -33,7 +33,11 @@ The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtain
 
 ![Plot_wrong_pred](https://github.com/simonevincenzi/Growth_Models/blob/master/Plots_growth/Plot_wrong_pred.jpg)
 
-(3) Plot of observed and predicted trajectories for two individuals (figure saved in `Plots_growth/Plot_pred_all.pdf`); (4) correlation between estimates of asymptotic size estimated for the two growth functions for the model with Population as predictor of the 3 parameters `mod_3_rand_l_Pop_k_Pop_t0_Pop` (data frame saved in `data/test_linf.RDS`). 
+(3) Plot of observed and predicted trajectories for two individuals (figure saved in `Plots_growth/Plot_pred_all.pdf`); 
+
+![Plot_pred](https://github.com/simonevincenzi/Growth_Models/blob/master/Plots_growth/Plot_pred_all.png)
+
+(4) saves in a data frame the correlation between estimates of asymptotic size estimated for the two growth functions for the model with Population as predictor of the 3 parameters `mod_3_rand_l_Pop_k_Pop_t0_Pop` (data frame saved in `data/test_linf.RDS`). 
 
 The scripts `Plots_growth.r`, after choosing a model directly in the script (e.g., `mod_3_rand_l_Species_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (figures saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`).
 
