@@ -285,8 +285,8 @@ for (i in 1:length(d1)) {
 #ll_list_temp_gomp = readRDS("ll_list_temp_gomp_single_UVol_BT.RDS")
 #ll_list_temp_vb = readRDS("ll_list_temp_vb_single_UVol_BT.RDS")
 
-#ll_list_temp_gomp = readRDS("ll_list_temp_gomp.RDS")
-#ll_list_temp_vb = readRDS("ll_list_temp_vb.RDS")
+#ll_list_temp_gomp = readRDS("data/ll_list_temp_gomp.RDS")
+#ll_list_temp_vb = readRDS("data/ll_list_temp_vb.RDS")
 
 #ll_list_temp_gomp = readRDS("ll_list_temp_gomp_all_data.RDS")
 #ll_list_temp_vb = readRDS("ll_list_temp_vb_all_data.RDS")

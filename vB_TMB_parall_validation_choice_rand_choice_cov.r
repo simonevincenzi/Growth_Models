@@ -7,9 +7,10 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
                                                              k_var = k_var, 
                                                              t0_var = t0_var, 
                                                              mod_id = mod_id,
-                                                             valid = 0,
+                                                             valid = valid,
                                                              seed = seed) {
   
+  ### Prepare the data frame with the metrics of model performance 
   
   model_rsq = tibble(rsq_gam_train = NA)
 
@@ -31,6 +32,7 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
   model_rsq$cont = cont
   model_rsq$n_pop = length(unique(data_region_df$Pop))
   
+  ### Filter out the sampling data not in September
   
   data_growth = data_region_df  
     
@@ -39,7 +41,8 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
     arrange(Mark, Age)
   
   
-    
+  ### If there is validation, filter out the rows with mark_valid = 1 and mark_age_kept = NA (mark_valid = 1 means that the individual is included in the validation data set, but mark_age_kept = 1 means that that measurements has to be kept in the training data set — it is the first measurement if that individual)  
+
   if (valid == 1) {
     
     data_growth = filter(data_growth, (is.na(mark_age_kept) & is.na(mark_valid)) | 
@@ -52,7 +55,9 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
     
   }  
   
-  if (valid == 0) {
+  ### if there is no validation, all data are kept in the training data set
+    
+    if (valid == 0) {
     
     cohort_df = select(data_region_df, Mark, Cohort) %>% group_by(Mark) %>% 
       summarise(Cohort = Cohort[1])
@@ -61,9 +66,8 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
   
   }  
     
-  # Define covariates (always Const, i.e. no covariates)
-  
-  ### Constant ####
+  # Define covariates (Const, i.e. no covariates)
+
   
   if (linf_var == "Const") {
     linf.formula =  ~ 1
@@ -287,6 +291,8 @@ vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df = da
                        func = NA,
                        n_pop = NA)
   
+  
+  ### Compile the TMB model
   
   require(TMB)
   if (file.exists("scripts/m_grow3_TMB_daily.o") == F){
@@ -1059,7 +1065,7 @@ model_rsq$n_pop = length(unique(data_growth$Pop))
     
     train_df = data.frame("Mark" = NA, "pred_mean" = NA, "Length" = NA, "Pop" = NA,
                          "Age" = NA, "Cohort" = NA, "mark_age_kept" = NA, "mark_valid" = NA,
-                         "type" = "test")
+                         "type" = "train")
   }
   
   
@@ -1074,7 +1080,7 @@ model_rsq$n_pop = length(unique(data_growth$Pop))
   
   
   return(list("pred_df" = pred_df, "model_rsq" = model_rsq, 
-              "test_df" = test_df, "train_df", train_df, "opt" = opt))
+              "test_df" = test_df, "train_df" = train_df, "opt" = opt))
   
   
 }

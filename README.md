@@ -1,5 +1,6 @@
-November 2019
-# Data and code for the manuscript "Biological and statistical interpretation of size-at-age, mixed-effects models of growth"
+March 2020
+
+# Data and code for the manuscript "Biological and statistical interpretation of size-at-age, mixed-effects models of growth", to be published in Journal of the Royal Society Open Science
 
 
 ## 1. Model fitting
@@ -24,7 +25,11 @@ The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtain
 
 The scripts `Plots_growth.r`, after choosing a model in the script (e.g., `mod_3_rand_l_Species_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (output saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`).
 
+## 3. Self-contained short exmaple
 
-## 3. Manuscript
+The script `self_contained.r` reads tag-recapture data and fits two mixed-effects models for vBGF and GGF (two replicates for each) in parallel pooling together all populations data. Then, it creates a data frame with metrics of models performance (avg_rsq_df), train (train_df) and test (test_df) datasets that include both raw data and model predictions, and a list (plot_list) with the same plots as in the manuscript (excluding raw trajectories and the correlation between asymptotic size and growth rate is only for the model with Pop as predictor of all 3 parameters). On my 2018 MacBookPro with 16 GB 2400 MHz DDR4 of RAM and 2.6 GHz Intel Core i7 CPU, it takes approximately 30 mins to run the script (the fitting itself is quite fast, but the predictions and their standard errors take much longer).
+
+
+## 4. Manuscript
 
 The manuscript is currently under review. A pre-print can be found at 

@@ -53,7 +53,8 @@ theme.tr =  theme(plot.title = element_text(lineheight=.8, face="bold", size = s
                   ,panel.border = element_blank()
                   ,panel.background = element_blank(),
                   axis.line = element_line(color = 'black'),
-                  plot.margin = unit(c(0.5,1.2,0.5,1.2), "cm"),
+                  #plot.margin = unit(c(0.5,1.2,0.5,1.2), "cm"),
+                  plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
                   axis.title.x = element_text(size=size.label.x,vjust=-2),
                   axis.text.x  = element_text(size=size.text.x, vjust = 0.5),
                   axis.title.y = element_text(size=size.label.x, vjust = 2),
@@ -84,7 +85,7 @@ uppidri_tr_gg = ggplot(filter(all_pop_df, Pop == "UIdri_MT"), aes(x = Age, y = L
   scale_y_continuous(limits = c(100,450)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
   labs(y = "Length (mm)") +
-  labs(x = "Age") 
+  labs(x = "Age (year)") 
 
 uppidri_tr_gg
 
@@ -108,7 +109,7 @@ loidri_tr_gg = ggplot(filter(all_pop_df, Pop == "LIdri_MT"), aes(x = Age, y = Le
   scale_y_continuous(limits = c(100,450)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
   labs(y = "Length (mm)") +
-  labs(x = "Age") 
+  labs(x = "Age (year)") 
 
 loidri_tr_gg
 
@@ -131,7 +132,7 @@ uppvol_tr_gg = ggplot(filter(all_pop_df, Pop == "UVol_BT"), aes(x = Age, y = Len
   scale_y_continuous(limits = c(100,450)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
   labs(y = "Length (mm)") +
-  labs(x = "Age") 
+  labs(x = "Age (year)") 
 
 uppvol_tr_gg
 
@@ -153,7 +154,7 @@ rtidri_tr_gg = ggplot(filter(all_pop_df, Pop == "LIdri_RT"), aes(x = Age, y = Le
   scale_y_continuous(limits = c(100,450)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
   labs(y = "Length (mm)") +
-  labs(x = "Age") 
+  labs(x = "Age (year)") 
 
 rtidri_tr_gg
 

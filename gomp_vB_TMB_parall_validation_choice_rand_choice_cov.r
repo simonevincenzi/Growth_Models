@@ -7,9 +7,11 @@ gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df
                                                              k_var = k_var, 
                                                              t0_var = t0_var, 
                                                              mod_id = mod_id,
-                                                             valid = 0,
+                                                             valid = valid,
                                                              seed = seed) {
   
+  
+  ### Prepare the data frame with the metrics of model performance 
   
   model_rsq = tibble(rsq_gam_train = NA)
 
@@ -39,7 +41,7 @@ gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df
     filter(., !is.na(Length), Length > 0, Month == 9) %>%
     arrange(Mark, Age)
   
-  
+    ### If there is validation, filter out the rows with mark_valid = 1 and mark_age_kept = NA (mark_valid = 1 means that the individual is included in the validation data set, but mark_age_kept = 1 means that that measurements has to be kept in the training data set — it is the first measurement if that individual)  
     
   if (valid == 1) {
     
@@ -55,7 +57,9 @@ gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df
     
     }  
   
-  if (valid == 0) {
+    ### if there is no validation, all data are kept in the training data set
+    
+      if (valid == 0) {
     
     cohort_df = select(data_region_df, Mark, Cohort) %>% group_by(Mark) %>% 
       summarise(Cohort = Cohort[1])
@@ -64,9 +68,8 @@ gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df
     
   }  
     
-  # Define covariates (always Const, i.e. no covariates)
-  
-  ### Constant ####
+  # Define covariates (i.e. no covariates)
+
   
   if (linf_var == "Const") {
     linf.formula =  ~ 1
@@ -289,6 +292,8 @@ gomp_vB_TMB_parall_validation_choice_rand_choice_cov.f = function(data_region_df
                        func = NA,
                        n_pop = NA)
   
+  
+  ### Compile the TMB model
   
   require(TMB)
   if (file.exists("scripts/m_grow3_TMB_daily_gomp.o") == F){
@@ -1041,11 +1046,11 @@ model_rsq$n_pop = length(unique(data_growth$Pop))
     
     train_df = data.frame("Mark" = NA, "pred_mean" = NA, "Length" = NA, "Pop" = NA,
                           "Age" = NA, "Cohort" = NA, "mark_age_kept" = NA, "mark_valid" = NA,
-                          "type" = "test")
+                          "type" = "train")
   }
   
   test_df$model = paste("mod",rand_eff_n,"rand","l",linf_var,"k",k_var,"t0",t0_var, sep = "_")
-  test_df$func = "vb"
+  test_df$func = "gomp"
   test_df$cont = cont
   
   train_df$model = paste("mod",rand_eff_n,"rand","l",linf_var,"k",k_var,"t0",t0_var, sep = "_")

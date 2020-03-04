@@ -123,24 +123,35 @@ for (i in 1:length(model_df)) {
 #### Model for correlation test of model estimates of asymptotic size within populations and plot of correlation
 
 
-test_param_corr = select(filter(param_corr_df, func == "vb"), model, Pop, func, Linf_mean) %>%
-  left_join(., select(filter(param_corr_df, func == "gomp"), model, Pop, func, Linf_mean), by = c("model", "Pop")) %>% 
-  rename(., Linf_vb = Linf_mean.x, Linf_gomp = Linf_mean.y)
+
+test_param_corr = select(filter(param_corr_df, func == "vb"), model, Pop, func, Linf_mean, Linf_sd) %>%
+  left_join(., select(filter(param_corr_df, func == "gomp"), model, Pop, func, Linf_mean, Linf_sd), by = c("model", "Pop")) %>% 
+  rename(., Linf_vb = Linf_mean.x, Linf_gomp = Linf_mean.y,
+            Linf_vb_sd = Linf_sd.x, Linf_gomp_sd = Linf_sd.y)
+
+
+# test_param_corr = select(filter(param_corr_df, func == "vb"), model, Pop, func, Linf_mean) %>%
+#   left_join(., select(filter(param_corr_df, func == "gomp"), model, Pop, func, Linf_mean), by = c("model", "Pop")) %>% 
+#   rename(., Linf_vb = Linf_mean.x, Linf_gomp = Linf_mean.y)
 
 
 
-test_param_corr %>%  group_by(Pop) %>% 
-  summarise(cor = cor.test(Linf_vb, Linf_gomp)$estimate,
-            p_value = cor.test(Linf_vb, Linf_gomp)$p.value,
-            ratio_mean = mean(Linf_vb/Linf_gomp),
-            ratio_sd = sd(Linf_vb/Linf_gomp),
-            ratio_min = min(Linf_vb/Linf_gomp),
-            ratio_max = max(Linf_vb/Linf_gomp))
+# test_param_corr %>%  group_by(Pop) %>% 
+#   summarise(cor = cor.test(Linf_vb, Linf_gomp)$estimate,
+#             p_value = cor.test(Linf_vb, Linf_gomp)$p.value,
+#             ratio_mean = mean(Linf_vb/Linf_gomp),
+#             ratio_sd = sd(Linf_vb/Linf_gomp),
+#             ratio_min = min(Linf_vb/Linf_gomp),
+#             ratio_max = max(Linf_vb/Linf_gomp))
 
 ### Plot of asymptotic size estimated with Gompertz and von Bertalanffy model
 
 Plot_corr_linf = ggplot(data = test_param_corr, aes(x = Linf_gomp, y = Linf_vb, shape = Pop, col = Pop)) +
   geom_point(size = 3, stroke = 1.5) + 
+  geom_errorbar(aes(ymin=Linf_vb-2*Linf_vb_sd, ymax=Linf_vb+2*Linf_vb_sd), lwd = 0.2,
+                show.legend = F) +
+  geom_errorbarh(aes(xmin=Linf_gomp-2*Linf_gomp_sd, xmax=Linf_gomp+2*Linf_gomp_sd), lwd = 0.2,
+                  show.legend = F) +
   scale_color_manual(values = c("gray30","gray50", "gray60","gray70")) +
   scale_shape_manual(values = c(1,2,3,4)) + 
   theme.out +
@@ -148,8 +159,8 @@ Plot_corr_linf = ggplot(data = test_param_corr, aes(x = Linf_gomp, y = Linf_vb, 
   labs(x = "A (mm)") +
   geom_abline(slope = 1, intercept = 0,
               na.rm = FALSE, show.legend = NA, lty = 2) +
-  scale_x_continuous(limits = c(165,750), breaks = c(200,300, 400, 500, 600, 700)) +
-  scale_y_continuous(limits = c(150,450),breaks = c(200,300,400)) +
+  scale_x_continuous(limits = c(165,850), breaks = c(200,300, 400, 500, 600, 700, 800)) +
+  scale_y_continuous(limits = c(150,500),breaks = c(200,300,400, 500)) +
   theme(
     axis.line = element_line(colour = "black"),
     plot.margin = unit(c(0.5,1.2,0.5,1.2), "cm"),
@@ -162,7 +173,7 @@ Plot_corr_linf = ggplot(data = test_param_corr, aes(x = Linf_gomp, y = Linf_vb, 
   ) +
   coord_fixed(ratio = 1)
 
-
+Plot_corr_linf
 
 ggsave("Plots_growth/Plot_corr_linf.jpg", Plot_corr_linf, width = 10, height = 10)
 
@@ -186,7 +197,7 @@ time_data = filter(all_pop_df, Mark %in% worst_pred$Mark_ind) %>%  group_by(Mark
 
 worst_pred = worst_pred %>% left_join(.,select(time_data, Mark,Length), by = c("Mark_ind" = "Mark")) %>% rename(Mark = Mark_ind)
 
-saveRDS(worst_pred,"data/worst_pred.RDS")
+#saveRDS(worst_pred,"data/worst_pred.RDS")
 
 
 #### Plot of worst predicted individuals with in the background the trajectories of the individuals in their populations
@@ -203,11 +214,13 @@ Plot_wrong_pred = ggplot(data = filter(all_pop_df, Mark %in% worst_pred$Mark), a
   scale_y_continuous(limits = c(0,400)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
   geom_line(data = filter(all_pop_df, Pop == "UVol_BT", Age <=7), aes(x = Age, y = Length, group = Mark), lwd = 0.03)  +
-  geom_line(data = filter(all_pop_df, Pop == "UIdri_MT", Age <=7), aes(x = Age, y = Length, group = Mark), lwd = 0.07, lty =2) 
+  geom_line(data = filter(all_pop_df, Pop == "UIdri_MT", Age <=7, Mark!=3439), aes(x = Age, y = Length, group = Mark), lwd = 0.07, lty =2) +
+  labs(y = "Length (mm)") +
+  labs(x = "Age (year)") 
   
 
 ggsave("Plots_growth/Plot_wrong_pred.jpg", Plot_wrong_pred, width = 9.5, height = 7.5)
-
+#ggsave("Plots_growth/Plot_wrong_pred.pdf", Plot_wrong_pred, width = 9.5, height = 7.5)
 
 
 #### Plot for prediction of test data (one good, one bad)
@@ -261,7 +274,7 @@ Plot_8145 = ggplot(data = filter(pred_8145_df), aes(x = Age, y = pred_mean, grou
   #geom_text_repel(data = pred_3155_df, aes(x = Age, y = Length, label = func)) +
   scale_y_continuous(limits = c(0,350)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
-  labs(x = "Age", y = "Length (mm)") +
+  labs(x = "Age (year)", y = "Length (mm)") +
   theme(axis.title.x = element_text(size=13,vjust=-2),
         axis.text.x  = element_text(size=10, vjust = 0.5),
         axis.title.y = element_text(size=13, vjust = 4),
@@ -288,7 +301,7 @@ Plot_3155 = ggplot(data = filter(pred_3155_df), aes(x = Age, y = pred_mean, grou
   #geom_text_repel(data = pred_3155_df, aes(x = Age, y = Length, label = func)) +
   scale_y_continuous(limits = c(0,350)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
-  labs(x = "Age", y = "Length (mm)") +
+  labs(x = "Age (year)", y = "Length (mm)") +
   theme(axis.title.x = element_text(size=13,vjust=-2),
         axis.text.x  = element_text(size=10, vjust = 0.5),
         axis.title.y = element_text(size=13, vjust = 4),
@@ -332,8 +345,6 @@ for (i in 1:length(ll_list_temp)) {
 }
 
 
-#pred_traj_all_df = pred_traj_all_df %>% filter(., !is.na(Length))
-
 
 test_traj_df$diff = test_traj_df$Length - test_traj_df$pred_mean   
 
@@ -356,12 +367,4 @@ saveRDS(test_linf, "data/test_linf.RDS")
 
 filter(test_linf, Mark %in% (test %>% filter(., Pop == "LIdri_RT"))$Mark)
 
-# test = test %>% left_join(.,pred_traj_df %>% 
-#                             filter(., Age == 1, cont == cont_min) %>%
-#                             group_by(Mark, func, Pop) %>% 
-#                             summarise(linf = linf, k=k, t0 = t0), by = c("Mark","Pop","func")
-# )
-# 
-# with(test, cor.test(diff.x,diff.y))
-# with(test, plot(diff.x ~ diff.y))
 
