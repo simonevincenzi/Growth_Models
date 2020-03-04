@@ -5,7 +5,7 @@ March 2020
 
 ## 1. Model fitting
 
-I ran the scripts and models with R version 3.6.1 (2019-07-05).
+I ran the scripts and models with R version 3.6.1 (2019-07-05) for Mac. The parallel routine uses mclapply, which works only on Mac and Linux machines. In the self-contained short example (see Section 3, `self_contained.r`), I included the code for fitting the models sequentially.
 
 The script `gomp_parall_tmb.r` reads tag-recapture data and fits the mixed-effects models in parallel pooling together all populations data. 
 
@@ -17,13 +17,19 @@ Both routines launched with `gomp_parall_tmb.r` and `gomp_parall_tmb.r` are RAM 
 
 You can reduce the number of replicates for each model (now set at 5) or the number of populations (now all 4) by changing a few parameters directly in `gomp_parall_tmb.r` and `gomp_parall_tmb_single.r`.
 
+The objects created are (1) data frame with read ID (Mark_cor), fake ID (Mark_ind) that avoids the problem of same tag used in different population, and Population (Pop) lists with the results of model fitting (`ll_list_temp_gomp.RDS` and `ll_list_temp_vb.RDS` when there is validation and `ll_list_temp_gomp_all_data.RDS` and `ll_list_temp_vb_all_data.RDS` with no validation)
+
 ## 2. Analysis of model fitting results    
 
-Donwload the files in `https://figshare.com/articles/Modeling_results_for_growth_models_-_vBGF_and_Gompertz/10301678` (> 450 MB) that have the already run results from `gomp_parall_tmb.r` and save them in the folder `data/`.
+Donwload the files in `https://figshare.com/articles/Modeling_results_for_growth_models_-_vBGF_and_Gompertz/10301678` (total size > 450 MB) that have the already run results from `gomp_parall_tmb.r` and save them in the folder `data/`.
 
 The script `Plot_traj.r` -- `source("Plot_traj.r")` -- produces the plot of observed trajectories for fish sampled in September. The figure is saved in `Plots_growth/ Plot_tr_gr_all.pdf`.  
 
-The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtained with the same model (24 models total, 12 for either growth function), for either Gompertz or von Bertalanffy growth functions (the figure is save in `Plots_growth/Plot_corr_linf.jpg`); (2) finds the most consistently worst predicted individuals (data frame saved in `data/worst_pred.RDS`) and plots their trajectories with the trajectories of other individuals in the same population in the background (figure saved in `Plots_growth/Plot_wrong_pred.jpg`); (3) Plot of observed and predicted trajectories for two individuals (figure saved in `Plots_growth/Plot_pred_all.pdf`); (4) correlation between estimates of asymptotic size estimated for the two growth functions for the model with Population as predictor of the 3 parameters `mod_3_rand_l_Pop_k_Pop_t0_Pop` (data frame saved in `data/test_linf.RDS`). 
+The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtained with the same model (24 models total, 12 for either growth function), for either Gompertz or von Bertalanffy growth functions (the figure is saved in `Plots_growth/Plot_corr_linf.jpg`); 
+
+![Plot_traj](https://github.com/simonevincenzi/Growth_Models/blob/master/Plots_growth/Plot_tr_gr_all_.png)
+
+(2) finds the most consistently worst predicted individuals (data frame saved in `data/worst_pred.RDS`) and plots their trajectories with the trajectories of other individuals in the same population in the background (figure saved in `Plots_growth/Plot_wrong_pred.jpg`); (3) Plot of observed and predicted trajectories for two individuals (figure saved in `Plots_growth/Plot_pred_all.pdf`); (4) correlation between estimates of asymptotic size estimated for the two growth functions for the model with Population as predictor of the 3 parameters `mod_3_rand_l_Pop_k_Pop_t0_Pop` (data frame saved in `data/test_linf.RDS`). 
 
 The scripts `Plots_growth.r`, after choosing a model directly in the script (e.g., `mod_3_rand_l_Species_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (figures saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`).
 
