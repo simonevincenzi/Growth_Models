@@ -480,6 +480,7 @@ plot_list = list()
 
 size.title = 15
 line.lwd = 0.35
+lwd.real = 1
 size.label.x = 18
 size.text.x = 14
 size.point = 2
@@ -931,7 +932,7 @@ max_age = 10.5
 
 Plot_worst = ggplot(data = filter(pred_worst_df), aes(x = Age, y = pred_mean, group = func)) + 
   geom_line(lty = 2) +
-  geom_line(data = pred_3155_df, aes(x = Age, y = Length), lwd = lwd.real) +
+  geom_line(data = pred_worst_df, aes(x = Age, y = Length), lwd = lwd.real) +
   theme.out + 
   scale_y_continuous(limits = c(0,350)) +
   scale_x_continuous(limits = c(0,max_age), breaks = seq(1,max_age,1)) +
