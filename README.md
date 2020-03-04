@@ -32,4 +32,4 @@ The script `self_contained.r` reads tag-recapture data and fits two mixed-effect
 
 ## 4. Manuscript
 
-The manuscript is currently under review. A pre-print can be found at 
+The manuscript is currently under review. A pre-print can be found at https://www.biorxiv.org/content/10.1101/845222v1
