@@ -39,13 +39,17 @@ The script `Plot_wrong_pred.r` (1) plots the estimates of asymptotic size obtain
 
 (4) saves in a data frame the correlation between estimates of asymptotic size estimated for the two growth functions for the model with Population as predictor of the 3 parameters `mod_3_rand_l_Pop_k_Pop_t0_Pop` (data frame saved in `data/test_linf.RDS`). 
 
-The scripts `Plots_growth.r`, after choosing a model directly in the script (e.g., `mod_3_rand_l_Pop_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (figures saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`). Here below, I show the distribution of asymptotic size for `mod_3_rand_l_Pop_k_Pop_t0_Pop`.
+The scripts `Plots_growth.r`, after choosing a model directly in the script (e.g., `mod_3_rand_l_Pop_k_Pop_t0_Pop` or `mod_3_rand_l_Const_k_Species_t0_Pop`), produces plots that show the distribution of asympotic size and k for all populations and each growth function, along with correlation plots of asymptotic size and k (figures saved in `Plots_growth/Plot_dens.pdf`, `Plots_growth/Plot_linf.pdf`, `Plots_growth/Plot_k.pdf`, `Plots_growth/Plot_corr.pdf`). Here below, I show the distribution of asymptotic size and the correaltion between asymptotic size and growth rate fo the model `mod_3_rand_l_Pop_k_Pop_t0_Pop`.
 
 ![Plot_distr_l_inf](https://github.com/simonevincenzi/Growth_Models/blob/master/Plots_growth/Plot_linf_first.png)
 
-## 3. Self-contained short exmaple
+![Plot_corr](https://github.com/simonevincenzi/Growth_Models/blob/master/Plots_growth/Plot_corr_first.png)
 
-The script `self_contained.r` reads tag-recapture data and fits two mixed-effects models for vBGF and GGF (two replicates for each) in parallel pooling together all populations data. Then, it creates a data frame with metrics of models performance (avg_rsq_df), train (train_df) and test (test_df) datasets that include both raw data and model predictions, and a list (plot_list) with the same plots as in the manuscript (excluding (a) raw trajectories and (b) the correlation between asymptotic size and growth rate is only for the model with Pop as predictor of all 3 parameters). On my 2018 MacBookPro with 16 GB 2400 MHz DDR4 of RAM and 2.6 GHz Intel Core i7 CPU, it takes approximately 30 mins to run the script (the fitting itself is quite fast, but the predictions and their standard errors take much longer).
+## 3. Self-contained short example
+
+The script `self_contained.r` reads tag-recapture data and fits two mixed-effects models for vBGF and GGF (two replicates for each) in parallel pooling together all populations data. Then, it creates a data frame with metrics of models performance (avg_rsq_df), train (train_df) and test (test_df) datasets that include both raw data and model predictions, and a list (plot_list) with the same plots as in the manuscript (excluding (a) raw trajectories and (b) the correlation between asymptotic size and growth rate is only for the model with Pop as predictor of all 3 parameters). 
+
+On my 2018 MacBookPro with 16 GB 2400 MHz DDR4 of RAM and 2.6 GHz Intel Core i7 CPU, it takes approximately 30 mins to run the script (the fitting itself is quite fast, but the predictions and their standard errors take much longer).
 
 
 ## 4. Manuscript
