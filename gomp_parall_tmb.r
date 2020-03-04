@@ -311,8 +311,10 @@ for (i in 1:length(ll_list_temp)) {
 
 }
  
+# saveRDS(pred_df, "data/pred_df.RDS")
 
 ### extract single model prediction with prediction and parameter confidence intervals
+
 pred_df = readRDS("data/pred_df.RDS")
 pred_model = "mod_3_rand_l_Species_k_Pop_t0_Pop"
 pred_traj_df = data.frame()
@@ -379,12 +381,14 @@ avg_rsq_df = rsq_df %>% group_by(model, func) %>%
   arrange(., desc(rsq_gam_test_mean))
 
 
+# saveRDS(avg_rsq_df, "data/avg_rsq_df.RDS")
+
 # if no validation, I also add a column with the AIC of model on the full data set
 
 if (validation == 0) {
   
   avg_rsq_df = avg_rsq_df %>% inner_join(., select(rsq_df, model, func, AIC))
-  saveRDS(avg_rsq_df,"avg_rsq_df_all.RDS")
+  saveRDS(avg_rsq_df,"data/avg_rsq_df_all.RDS")
 }
                                                       
 
