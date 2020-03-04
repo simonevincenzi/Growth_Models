@@ -5,8 +5,7 @@
 ##### Load libraries
 
 if(!require(pacman))install.packages("pacman")
-pacman::p_load("tidyverse", "data.table", "parallel", 
-               "brms", "TMB", "lubridate", "devtools", 
+pacman::p_load("tidyverse", "data.table", "parallel", "TMB", "lubridate", "devtools", 
                "Metrics", "rlist","withr",
                "cowplot", "ggrepel")
 
@@ -14,7 +13,6 @@ pacman::p_load("tidyverse", "data.table", "parallel",
 library(tidyverse)
 library(data.table)
 library(parallel)
-library(brms)
 library(TMB)
 library(lubridate)
 library(devtools)
